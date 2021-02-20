@@ -1,6 +1,6 @@
 # Code-Server Helm Chart
 
-Image used is built fromn [this](https://github.com/KyWa/dockerbuilds/tree/master/code-server) repo. 
+Image used is built from [this](https://github.com/KyWa/dockerbuilds/tree/master/code-server) repo. 
 
 ## TODO
 
