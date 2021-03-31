@@ -52,8 +52,12 @@ service:
   type: ClusterIP
   port: 8080
 
+ingress:
+  enabled: false
+
+
 route:
-  enabled: true
+  enabled: false
   targetPort: http
   tls:
     enabled: false
