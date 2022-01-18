@@ -3,7 +3,7 @@ codeServer:
     image:
       repository: codercom/code-server
       tag: latest
-  password: ""
+  password: "CHANGEME"
   ports:
   - port: 80
     targetPort: 8080
