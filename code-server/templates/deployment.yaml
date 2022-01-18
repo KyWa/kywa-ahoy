@@ -1,65 +1,38 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "code-server.fullname" . }}
+  name: {{ include "code-server.fullname" . }}-code-server
   labels:
-    {{- include "code-server.labels" . | nindent 4 }}
+    app: code-server
+  {{- include "code-server.labels" . | nindent 4 }}
 spec:
-{{- if not .Values.autoscaling.enabled }}
-  replicas: {{ .Values.replicaCount }}
-{{- end }}
+  replicas: {{ .Values.codeServer.replicas }}
   selector:
     matchLabels:
-      {{- include "code-server.selectorLabels" . | nindent 6 }}
+      app: code-server
+    {{- include "code-server.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-    {{- with .Values.podAnnotations }}
-      annotations:
-        {{- toYaml . | nindent 8 }}
-    {{- end }}
       labels:
-        {{- include "code-server.selectorLabels" . | nindent 8 }}
+        app: code-server
+      {{- include "code-server.selectorLabels" . | nindent 8 }}
     spec:
-      {{- with .Values.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      serviceAccountName: {{ include "code-server.serviceAccountName" . }}
-      securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-        - name: {{ .Chart.Name }}
-          securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-{{- if .Values.env }}
-          env:
-            {{- tpl (toYaml .Values.env) . | nindent 12 }}
-{{- end }}
-          ports:
-            - name: http
-              containerPort: 8080
-              protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /
-              port: http
-          readinessProbe:
-            httpGet:
-              path: /
-              port: http
-          resources:
-            {{- toYaml .Values.resources | nindent 12 }}
-      {{- with .Values.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+      - env:
+        - name: PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: password
+              name: {{ include "code-server.fullname" . }}-code-server
+        image: {{ .Values.codeServer.codeServer.image.repository }}:{{ .Values.codeServer.codeServer.image.tag
+          | default .Chart.AppVersion }}
+        imagePullPolicy: Always
+        name: code-server
+        resources: {}
+        volumeMounts:
+        - mountPath: /home/coder
+          name: coder
+      volumes:
+      - name: coder
+        persistentVolumeClaim:
+          claimName: {{ include "code-server.fullname" . }}-code-server
