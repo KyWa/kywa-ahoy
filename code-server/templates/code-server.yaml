@@ -20,7 +20,7 @@ spec:
     app: code-server
   {{- include "code-server.selectorLabels" . | nindent 4 }}
   ports:
-	{{- .Values.codeServer.ports | toYaml | nindent 2 -}}
+  {{- .Values.codeServer.ports | toYaml | nindent 2 -}}
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -45,7 +45,7 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
-  - host: code.kywa.io
+  - host: "code.kywa.io"
     http:
       paths:
       - backend:
