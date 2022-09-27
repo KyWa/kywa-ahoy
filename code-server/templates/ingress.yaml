@@ -1,0 +1,21 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "code-server.fullname" . }}-code-server
+  labels:
+  {{- include "code-server.labels" . | nindent 4 }}
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - host: "code.kywa.io"
+    http:
+      paths:
+      - backend:
+          service:
+            name: '{{ include "code-server.fullname" . }}-code-server'
+            port:
+              number: 80
+        path: /codeserver
+        pathType: Prefix
